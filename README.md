@@ -9,8 +9,8 @@
     - [Create Face Database](#create-face-database)
         - [1. Download Face images from CelebA](#1-download-face-images-from-celeba)
         - [2. Create CSV file](#2-create-csv-file)
-        - [3. Resiter command](#3-resiter-command)
-        - [4. Verify](#4-verify)
+        - [3. Regiter command](#3-regiter-command)
+        - [4. Verify data](#4-verify-data)
     - [Run app](#run-app)
 
 <!-- /TOC -->
@@ -94,7 +94,7 @@ optional arguments:
 
 At first, you need to create face Database.
 
-Here is an example of registraiton faces from csv file
+Here is an example of face registration from csv file.
 
 ### 1. Download Face images from CelebA
 
@@ -116,11 +116,11 @@ imagepath, label
 /path/to/celeba/img_align_celeba\020000.jpg, F20000
 ```
 
-### 3. Resiter command
+### 3. Regiter command
 
-You can ignore the errors during registration of faces.
 
 `dbname`_vecs.gz and `dbname`_pics.gz will be created.
+(You can ignore the errors during face registration.)
 
 ```sh
 python registrar.py csv_register --csv celeba.csv --dbname celeba --batch_size 500
@@ -137,9 +137,9 @@ The size of Feature vectors file produced from 20,000 is abount 22 MB.
 2019/06/26  22:06        23,168,652 celeba_vecs.gz
 ```
 
-Face images are saved at \static\images\celeba
+Face images are saved at /static/images/`dbname`
 
-### 4. Verify
+### 4. Verify data
 
 ```sh
 python registrar.py list --dbname celeba
