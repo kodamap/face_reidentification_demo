@@ -118,3 +118,9 @@ dmypy.json
 extension/
 old/
 notebook/
+static/images/face
+static/images/celeba
+celeba_pics.gz
+celeba_vecs.gz
+face_pics.gz
+face_vecs.gz

@@ -35,6 +35,7 @@ basicConfig(
 is_async = True
 is_fd = False   # face detection
 is_fi = False  # face re-identification
+is_preprocess = False
 
 # 0:x-axis 1:y-axis -1:both axis
 flip_code = 1
@@ -55,8 +56,14 @@ def preprocess(frame):
 def gen(camera):
     while True:
         frame = camera.get_frame(flip_code)
-        frame = detections.face_detection(
-            frame, is_async, face_vecs, face_labels, is_fd, is_fi)
+
+        if not is_preprocess:
+            frame = detections.face_detection(
+                frame, is_async, face_vecs, face_labels, is_fd, is_fi)
+        else:
+            logger.info(
+                "another preproces task detected: {}".format(is_preprocess))
+
         ret, jpeg = frame = cv2.imencode('.jpg', frame)
         frame = jpeg.tostring()
         yield (b'--frame\r\n'
@@ -138,6 +145,7 @@ def registrar():
     # global is_async, is_fd, is_fi
     global face_labels
     global face_vecs
+    global is_preprocess
 
     command = request.json['command']
 
@@ -146,11 +154,9 @@ def registrar():
         frame = camera.get_frame(flip_code)
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
+        is_preprocess = True
         feature_vecs, aligned_faces = preprocess(frame)
-        #detections.face_detector.infer(frame, frame, is_async=False)
-        #faces = detections.face_detector.get_results(is_async=False)
-        #face_frames, boxes = get_face_frames(faces, frame)
-        #feature_vecs, aligned_faces = detections.preprocess(face_frames)
+        is_preprocess = False
 
         # set ramdom label to refresh image when reloaded as same filename
         mylabel = "face" + str(datetime.now().strftime("%H%M%S"))
@@ -174,11 +180,9 @@ def registrar():
         if frame.shape[1] >= resize_width:
             frame = resize_frame(frame, resize_width)
 
+        is_preprocess = True
         feature_vecs, aligned_faces = preprocess(frame)
-        ##detections.face_detector.infer(frame, frame, is_async=False)
-        ##faces = detections.face_detector.get_results(is_async=False)
-        ##face_frames, boxes = get_face_frames(faces, frame)
-        ##feature_vecs, aligned_faces = detections.preprocess(face_frames)
+        is_preprocess = False
 
         face_vecs_dict, face_pics_dict = face_register.update(
             feature_vecs, aligned_faces, label)
