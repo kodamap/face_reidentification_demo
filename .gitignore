@@ -115,7 +115,6 @@ dmypy.json
 .pyre/
 
 # custom
-extension/
 old/
 notebook/
 static/images/face
