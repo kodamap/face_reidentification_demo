@@ -1,0 +1,78 @@
+{# ref. https://mdbootstrap.com/docs/jquery/modals/basic/ #}
+<div class="modal fade" id="modalFacePreview" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-fluid modal-notify modal-dark" role="document">
+        <!--Content-->
+        <div class="modal-content">
+
+            <!--Header-->
+            <div class="modal-header">
+                <p class="heading lead">Face Preview</p>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true"></span><i class="fas fa-window-close"></i></button>
+            </div>
+            <!--Body-->
+            <div class="modal-body text-center mb-1">
+                <h5 id="label" class="mt-1 mb-2"></h5>
+                <img src="#" class="img-responsive" alt="Face Preview">
+
+                <div class="text-center mt-4">
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" id="new-label" autocomplete="off" placeholder="NewLabel"
+                            aria-label="NewLabel" aria-describedby="basic-addon1" />
+                    </div>
+                </div>
+                <button id="save" type="button" class="btn btn-success" data-dismiss="modal" value="save"
+                    disabled="disabled">Save
+                    <i class="fas fa-save ml-1"></i>
+                </button>
+            </div>
+            <button id="remove" type="button" class="btn btn-danger" data-dismiss="modal" value="remove">Remove</button>
+        </div>
+        <!--/.Content-->
+    </div>
+</div>
+<!--Modal Form Login with Avatar Demo-->
+
+<div class="modal fade" id="modalFaceRegister" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-fluid modal-notify modal-dark" role="document">
+        <!--Content-->
+        <div class="modal-content">
+
+            <!--Header-->
+            <div class="modal-header"">
+                    <p class=" heading lead">Face Register</p>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"><i
+                            class="fas fa-window-close"></i></span></button>
+            </div>
+            <!--Body-->
+            <div class="modal-body text-center mb-1">
+
+                <div class="text-center mt-4">
+                    <i class="fas fa-user-tag fa-2x"></i>
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" id="face-label" autocomplete="off"
+                            placeholder="FaceLabel" aria-label="FaceLabel" aria-describedby="basic-addon1" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div id="file" class="input-group">
+                        <div class="custom-file">
+                            <input type="file" id="cutomfile" class="custom-file-input" name="cutomfile[]" multiple />
+                            <label class="custom-file-label" id="custom-file-label" for="customfile"
+                                data-browse="Choose">Choose
+                                File</label>
+                        </div>
+                        <div class="input-group-append">
+                            <button type="button" class="btn btn-outline-secondary" id="reset">Reset</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button id="register" type="button" class="btn btn-success" data-dismiss="modal" value="register"
+                disabled="disabled">Register</button>
+        </div>
+        <!--/.Content-->
+    </div>
+</div>
