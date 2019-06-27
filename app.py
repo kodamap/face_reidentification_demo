@@ -45,10 +45,14 @@ resize_width = 640
 
 
 def preprocess(frame):
+    global is_preprocess
+
+    is_preprocess = True
     detections.face_detector.infer(frame, frame, is_async=False)
     faces = detections.face_detector.get_results(is_async=False)
     face_frames, boxes = get_face_frames(faces, frame)
     feature_vecs, aligned_faces = detections.preprocess(face_frames)
+    is_preprocess = False
 
     return feature_vecs, aligned_faces
 
@@ -145,7 +149,6 @@ def registrar():
     # global is_async, is_fd, is_fi
     global face_labels
     global face_vecs
-    global is_preprocess
 
     command = request.json['command']
 
@@ -154,9 +157,7 @@ def registrar():
         frame = camera.get_frame(flip_code)
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
-        is_preprocess = True
         feature_vecs, aligned_faces = preprocess(frame)
-        is_preprocess = False
 
         # set ramdom label to refresh image when reloaded as same filename
         mylabel = "face" + str(datetime.now().strftime("%H%M%S"))
@@ -180,9 +181,7 @@ def registrar():
         if frame.shape[1] >= resize_width:
             frame = resize_frame(frame, resize_width)
 
-        is_preprocess = True
         feature_vecs, aligned_faces = preprocess(frame)
-        is_preprocess = False
 
         face_vecs_dict, face_pics_dict = face_register.update(
             feature_vecs, aligned_faces, label)
