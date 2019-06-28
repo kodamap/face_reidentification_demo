@@ -121,7 +121,12 @@ class Register:
         return face_vecs_dict, face_pics_dict
 
     def change(self, old_label, new_label):
+
         face_vecs_dict, face_pics_dict = self.load()
+
+        if new_label in face_pics_dict:
+            logger.error("new_label:[{}] already exists.".format(new_label))
+            return face_vecs_dict, face_pics_dict
 
         old_label, new_label = str(old_label), str(new_label)
 
