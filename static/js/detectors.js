@@ -2,28 +2,24 @@ $(function () {
 
     const detection_cmd = ['async', 'sync', 'face-det', 'face-reid'];
 
+    $.ajaxSetup({ cache: false });
+    $('#search-list').fadeOut(500);
+
     // empty check of label
     // https://stackoverflow.com/questions/17699094/if-input-field-is-empty-disable-submit-button/17699138
-    $(document).ready(function () {
-
-        $.ajaxSetup({ cache: false });
-        $('#search-list').fadeOut(500);
-
-        $('.modal-body').find('input').keyup(function () {
-            if ($('#face-label').val().length != 0) {
-                $('#register').attr('disabled', false);
-            } else {
-                $('#register').attr('disabled', true);
-            }
-            if ($('#new-label').val().length != 0) {
-                $('#save').attr('disabled', false);
-                $('#remove').attr('disabled', true);
-            } else {
-                $('#save').attr('disabled', true);
-                $('#remove').attr('disabled', false);
-            }
-        });
-
+    $('.modal-body').find('input').keyup(function () {
+        if ($('#face-label').val().length != 0) {
+            $('#register').attr('disabled', false);
+        } else {
+            $('#register').attr('disabled', true);
+        }
+        if ($('#new-label').val().length != 0) {
+            $('#save').attr('disabled', false);
+            $('#remove').attr('disabled', true);
+        } else {
+            $('#save').attr('disabled', true);
+            $('#remove').attr('disabled', false);
+        }
     });
 
     // File selector initialize modal 
@@ -32,34 +28,40 @@ $(function () {
         $('#custom-file-label').text('Choose File...');
         $('#face-label').val('');
         $('#preview').remove('');
+        $('#customFile').attr('disabled', false);
+        $('#custom-file-label').attr('disabled', false);
     };
 
     $('#modalFaceRegister').on('show.bs.modal', function () {
         resetFileSelect();
     });
 
-    // https://cccabinet.jpn.org/bootstrap4/javascript/forms/file-browser
-    $('.custom-file-input').on('change', handleFileSelect);
-    function handleFileSelect(evt) {
+    /*
+    ref :https://www.w3schools.com/bootstrap4/bootstrap_forms_custom.asp
+         https://cccabinet.jpn.org/bootstrap4/javascript/forms/file-browser
+    */
+    // Add the following code if you want the name of the file appear on select
+    $(".custom-file-input").on("change", function (e) {
+        let files = e.target.files;
+        let filename = files[0].name;
+        let filetype = files[0].type;
 
-        $(this).parents('.input-group').after('<div id="preview"></div>');
-        var files = evt.target.files;
-        for (var i = 0, f; f = files[i]; i++) {
-
+        if (files && files[0]) {
             var reader = new FileReader();
-            reader.onload = (function (theFile) {
-                return function (e) {
-                    if (theFile.type.match('image.*')) {
-                        var $html = ['<div class="d-inline-block mr-1 mt-1"><img class="img-thumbnail" src="', e.target.result, '" title="', escape(theFile.name), '" style="height:100px;" /><div class="small text-muted text-center">', escape(theFile.name), '</div></div>'].join('');// 画像では画像のプレビューとファイル名の表示
-                    } else {
-                        $('#custom-file-label').text('Invalid file type:' + theFile.type);
-                        return
-                    }
-                    $('#preview').append($html);
-                };
-            })(f);
 
-            reader.readAsDataURL(f);
+            $(this).parents('.input-group').after('<div id="preview"></div>');
+
+            reader.onload = (function (e) {
+                if (filetype.match('image.*')) {
+                    var $html = ['<div class="d-inline-block mr-1 mt-1"><img class="img-thumbnail" src="', e.target.result, '" title="', escape(filename), '" style="height:100px;" /><div class="small text-muted text-center">', escape(filename), '</div></div>'].join('');
+                } else {
+                    var $html = ['<div class="small text-muted text-center">', 'Invalid file type:' + filetype, '</div>'].join('');
+                }
+                $('#preview').append($html);
+            });
+            reader.readAsDataURL(files[0]);
+            $('#customFile').attr('disabled', true);
+            $('#custom-file-label').attr('disabled', true);
         }
 
         $(this).next('.custom-file-label').html(+ files.length + 'selected');
@@ -75,7 +77,7 @@ $(function () {
             });
             post('/registrar', command);
         });
-    }
+    });
 
     function reloadFaceList() {
         $('#face-list').fadeOut(1000);
@@ -173,7 +175,8 @@ $(function () {
 
             //console.log("post_command", post_command);
 
-            $("#res").text("command: " + post_command + " async: " + is_async + " flip: " + flip_code + " face: " + is_fd + " reid: " + is_fi + " Status: " + textStatus);
+            //$("#res").text("command: " + post_command + " async: " + is_async + " flip: " + flip_code + " face: " + is_fd + " reid: " + is_fi + " Status: " + textStatus);
+            $("#res").text("Command: " + post_command + " Status: " + textStatus);
             $('#search-list').fadeOut(100);
 
             if (JSON.parse(command).command == 'async') {

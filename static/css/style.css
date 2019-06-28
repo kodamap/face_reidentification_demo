@@ -20,7 +20,7 @@
 #res {
   margin: 5px;
   background-color: rgb(171, 201, 240);
-  display:none;
+  /*display:none;*/
 }
 
 .btn-group{
