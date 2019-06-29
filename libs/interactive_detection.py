@@ -22,7 +22,10 @@ model_fc_xml = 'face-detection-retail-0004.xml'  # input , shape: [1x3x300x300]
 model_lm_xml = 'landmarks-regression-retail-0009.xml'
 model_fi_xml = 'face-reidentification-retail-0095.xml'
 
+# Threshold of similarity to draw result on faces
 sim_threshold = 0.4
+# Limit count to infer face reidentification
+fi_limit = 4
 
 
 class Detectors:
@@ -180,8 +183,9 @@ class Detections(Detectors):
 
             # set target
             inf_start = timer()
-            # select first 4 faces. Too many faces effect performance.
-            feature_vecs, aligned_faces = self.preprocess(face_frames[0:4])
+            # select 'fi_limit' faces. Too many faces effect performance.
+            feature_vecs, aligned_faces = self.preprocess(
+                face_frames[:fi_limit])
             inf_end = timer()
 
             det_time_fi = inf_end - inf_start
