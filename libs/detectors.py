@@ -16,7 +16,7 @@ myriad_plugin = None
 is_cpu_plugin_initialized = False
 cpu_plugin = None
 
-prob_threshold_face = 0.9
+prob_threshold_face = 0.8
 
 
 class BaseDetection(object):
