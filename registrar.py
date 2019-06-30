@@ -3,6 +3,7 @@ from libs.interactive_detection import Detections
 from argparse import ArgumentParser
 from libs.utils import get_frame, get_face_frames
 import csv
+import sys
 
 
 def preprocess(image, detections):
@@ -57,7 +58,7 @@ def change(label):
     face_vecs, face_pics = register.change(old_label, new_label)
     register.save(face_vecs, face_pics)
 
-    register.lists(new_label)
+    register.lists([new_label])
 
 
 def lists(label):
@@ -158,23 +159,31 @@ if __name__ == "__main__":
     devices = ['CPU', 'CPU', 'CPU']
     cpu_extension = 'extension/cpu_extension.dll'
     frame = None
+    label_required_method = ['create', 'update', 'remove', 'change']
 
     register = Register(args.dbname)
 
+    if args.method in label_required_method and not args.label:
+        if args.method == 'change':
+            print("No label specified. use --label old_label new_label")
+        else:
+            print("No label specified. use --label <face label>")
+        sys.exit()
+
     if args.method == 'create' or args.method == 'update' or args.method == 'csv_register':
         detections = Detections(frame, devices, cpu_extension)
-
-    if args.method == 'create':
-        create(args.input, detections, args.label)
-
-    if args.method == 'update':
-        update(args.input, detections, args.label)
+        if args.method == 'create':
+            create(args.input, detections, args.label)
+        if args.method == 'update':
+            update(args.input, detections, args.label)
+        if args.method == 'csv_register':
+            if args.csv and args.dbname:
+                csv_register(args.csv, detections, args.batch_size)
+            else:
+                print("No csv file specified. use --csv <csvfile> and --dbname <dbname>")
 
     if args.method == 'change':
-        if args.label:
-            change(args.label)
-        else:
-            print("No label specified. use --label old_label new_label")
+        change(args.label)
 
     if args.method == 'list':
         lists(args.label)
@@ -183,13 +192,4 @@ if __name__ == "__main__":
         show(args.label)
 
     if args.method == 'remove':
-        if args.label:
-            remove(args.label)
-        else:
-            print("No label specified. use --label")
-
-    if args.method == 'csv_register':
-        if args.csv and args.dbname:
-            csv_register(args.csv, detections, args.batch_size)
-        else:
-            print("No csv file specified. use --csv <csvfile> and --dbname <dbname>")
+        remove(args.label)

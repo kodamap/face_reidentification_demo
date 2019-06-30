@@ -74,6 +74,8 @@ class Register:
         face_pics = {}
         face_vecs_dict = {}
         face_pics_dict = {}
+        
+        face_vecs_dict, face_pics_dict = self.load()
 
         # face vectors
         for face_id, feature_vec in enumerate(feature_vecs):
@@ -130,15 +132,13 @@ class Register:
 
         # create new key with the data of old label (dict can not change the key)
         face_vecs_dict[new_label] = face_vecs_dict.pop(old_label)
-        face_pics_dict[new_label] = face_pics_dict.pop(old_label)
-
-        with open(self.vecs_file, 'wb') as f:
-            joblib.dump(face_vecs_dict, f, compress='gzip')
-        with open(self.pics_file, 'wb') as f:
-            joblib.dump(face_pics_dict, f, compress='gzip')
 
         old_image_file = os.path.join(self.images_path, old_label + '.jpg')
         new_image_file = os.path.join(self.images_path, new_label + '.jpg')
+        face_pics_dict.pop(old_label)
+        face_pics_dict[new_label] = new_image_file
+
+        self.save(face_vecs_dict, face_pics_dict)
 
         if os.path.exists(old_image_file):
             os.rename(old_image_file, new_image_file)
