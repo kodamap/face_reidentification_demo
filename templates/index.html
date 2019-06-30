@@ -84,7 +84,7 @@
             <div class=" col-xs-12" id="face-list">
                 <div class="btn-group btn-group-toggle" data-toggle="buttons">
                     {% for label in face_labels %}
-                    {% set filename = 'images/face/' ~ label ~ '.png' %}
+                    {% set filename = 'images/face/' ~ label ~ '.jpg' %}
                     <div class="d-inline-block mr-1 mt-1">
                         <label class="btn btn-secondary btn-sm" id="{{ label }}-search-btn">
                             <input type="radio" name="options" value="search" data-label="{{ label }}"
@@ -117,7 +117,7 @@
                 <h2 class="mt-1 mb-2">Similar faces (Top 5)</h2>
 
                 {% for i, (label, score) in enumerate(search_result.items()) %}
-                {% set filename = 'images/' ~ dbname ~ '/' ~ label ~ '.png' %}
+                {% set filename = 'images/' ~ dbname ~ '/' ~ label ~ '.jpg' %}
 
                 <div class="d-inline-block mr-1 mt-1">
                     {% if i == 0 %}

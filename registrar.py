@@ -81,6 +81,7 @@ def csv_register(csvfile, detections, batch_size):
         face_vecs_dict = {}
         face_pics_dict = {}
 
+        face_vecs_dict, face_pics_dict = register.load()
         count = 1
         for row in reader:
             image = row['imagepath']
@@ -98,7 +99,7 @@ def csv_register(csvfile, detections, batch_size):
                 face_vecs_dict.update(face_vecs)
                 face_pics_dict.update(face_pics)
             else:
-                print("{} faces are detected. skip {}".format(
+                print("{} faces are detected. skipping {}".format(
                     len(aligned_faces), label))
 
             if batch_size and count % batch_size == 0:
@@ -188,7 +189,7 @@ if __name__ == "__main__":
             print("No label specified. use --label")
 
     if args.method == 'csv_register':
-        if args.csv:
+        if args.csv and args.dbname:
             csv_register(args.csv, detections, args.batch_size)
         else:
-            print("No csv file specified. use --csv <csvfile>")
+            print("No csv file specified. use --csv <csvfile> and --dbname <dbname>")

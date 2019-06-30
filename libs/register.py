@@ -58,7 +58,7 @@ class Register:
 
         for face_id, aligned_face in enumerate(aligned_faces):
             # save image path. add '/' to user as URL Static Path
-            image_file = "/" + self.images_path + label[face_id] + ".png"
+            image_file = "/" + self.images_path + label[face_id] + ".jpg"
             face_pics_dict[label[face_id]] = image_file
 
             # create face image files
@@ -74,8 +74,6 @@ class Register:
         face_pics = {}
         face_vecs_dict = {}
         face_pics_dict = {}
-
-        face_vecs_dict, face_pics_dict = self.load()
 
         # face vectors
         for face_id, feature_vec in enumerate(feature_vecs):
@@ -94,7 +92,7 @@ class Register:
         # face pictures
         for face_id, aligned_face in enumerate(aligned_faces):
             try:
-                image_file = "/" + self.images_path + label[face_id] + ".png"
+                image_file = "/" + self.images_path + label[face_id] + ".jpg"
                 face_pics[label[face_id]] = image_file
 
                 # create face image files
@@ -105,7 +103,7 @@ class Register:
             except IndexError:
                 # when no labels are specified
                 image_file = "/" + self.images_path + \
-                    label[0] + str(face_id) + ".png"
+                    label[0] + str(face_id) + ".jpg"
                 face_pics[label[0] + str(face_id)] = image_file
 
                 # create face image files
@@ -139,8 +137,8 @@ class Register:
         with open(self.pics_file, 'wb') as f:
             joblib.dump(face_pics_dict, f, compress='gzip')
 
-        old_image_file = os.path.join(self.images_path, old_label + '.png')
-        new_image_file = os.path.join(self.images_path, new_label + '.png')
+        old_image_file = os.path.join(self.images_path, old_label + '.jpg')
+        new_image_file = os.path.join(self.images_path, new_label + '.jpg')
 
         if os.path.exists(old_image_file):
             os.rename(old_image_file, new_image_file)
@@ -184,7 +182,7 @@ class Register:
                 if num >= 1 and os.path.exists("." + image_file):
                     print("{}, label:{} file:{}".format(
                         face_id, label, image_file))
-                    # expect file path like "./staic/images/faces/[label].png"
+                    # expect file path like "./staic/images/faces/[label].jpg"
                     frame = get_frame("." + image_file)
                     ax = plt.subplot(rows, cols, face_id + 1)
                     ax.set_title("{}".format(label), fontsize=8)
@@ -227,7 +225,7 @@ class Register:
 
         self.save(face_vecs, face_pics)
 
-        image_file = os.path.join(self.images_path, label + '.png')
+        image_file = os.path.join(self.images_path, label + '.jpg')
 
         if os.path.exists(image_file):
             os.remove(image_file)
