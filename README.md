@@ -128,7 +128,7 @@ python registrar.py csv_register --csv celeba.csv --dbname celeba --batch_size 5
 
 `celeba_vecs.gz` includes feature vectors, `celeca_pics.gz` includes image path of each faces.
 
-The size of Feature vectors file produced from 20,000 is abount 22 MB.
+The size of feature vectors file produced from 20,000 face images is about 22 MB.
 
 ```sh
 >dir
