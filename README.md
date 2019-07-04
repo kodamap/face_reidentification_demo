@@ -19,7 +19,7 @@
 
 ## What's this
 
-This is Face Identification Test App with Intel OpenVINO Face Re-IdentificationModel.
+This is Face Identification Test App with Intel OpenVINO Face Re-Identification Model.
 
 You can do followings:
 
@@ -49,8 +49,10 @@ Face Search
 ## Environment
 
 * Python 3.6+ (Required Ordered Dict)
-* OpenVINO Toolkit 2018 R5  (did not work 2019 R1)
+* OpenVINO Toolkit 2018 R5[^1]
 * Windows 10
+
+[^1]: You may get "RuntimeError: Cannot load library 'extension\cpu_extension.dll': 126" Error if you use 2019 R1. Try to specify full path of cpu_extension.dll.
 
 
 ## Required Python packages
@@ -110,23 +112,23 @@ I tested to register 20,000 faces. Change /path/to/celeba.
 
 ```txt:celeba.csv
 imagepath, label
-/path/to/celeba/img_align_celeba\000001.jpg, F00001
-/path/to/celeba/img_align_celeba\000002.jpg, F00002
+/path/to/celeba/img_align_celeba\000001.jpg,F00001
+/path/to/celeba/img_align_celeba\000002.jpg,F00002
 ..
-/path/to/celeba/img_align_celeba\020000.jpg, F20000
+/path/to/celeba/img_align_celeba\020000.jpg,F20000
 ```
 
 ### 3. Regiter command
 
 
-`dbname`_vecs.gz and `dbname`_pics.gz will be created.
+[dbname]_vecs.gz and [dbname]_pics.gz are created.
 (You can ignore the errors during face registration.)
 
 ```sh
 python registrar.py csv_register --csv celeba.csv --dbname celeba --batch_size 500
 ```
 
-`celeba_vecs.gz` includes feature vectors, `celeca_pics.gz` includes image path of each faces.
+`celeba_vecs.gz` includes feature vectors, `celeca_pics.gz` includes image path of each face.
 
 The size of feature vectors file produced from 20,000 face images is about 22 MB.
 
@@ -137,7 +139,7 @@ The size of feature vectors file produced from 20,000 face images is about 22 MB
 2019/06/26  22:06        23,168,652 celeba_vecs.gz
 ```
 
-Face images are saved at /static/images/`dbname`
+Face images are saved to /static/images/`dbname`
 
 ### 4. Verify data
 
