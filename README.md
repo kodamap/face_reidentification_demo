@@ -52,7 +52,7 @@ Face Search
 * OpenVINO Toolkit 2018 R5[^1]
 * Windows 10
 
-[^1]: You may get "RuntimeError: Cannot load library 'extension\cpu_extension.dll': 126" Error if you use 2019 R1. Try to specify full path of cpu_extension.dll.
+[^1]: You may get "RuntimeError: Cannot load library 'extension\cpu_extension.dll': 126" Error. Please try to specify full path of `cpu_extension.dll`.
 
 
 ## Required Python packages
