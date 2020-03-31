@@ -49,7 +49,7 @@ Face Search
 ## Environment
 
 * Python 3.6+ (Required Ordered Dict)
-* OpenVINO Toolkit 2018 R5[^1]
+* OpenVINO Toolkit 2018 R5, 2019 R3, 2020.1 [^1]
 * Windows 10
 
 [^1]: You may get "RuntimeError: Cannot load library 'extension\cpu_extension.dll': 126" Error. Please try to specify full path of `cpu_extension.dll`.
@@ -112,10 +112,11 @@ I tested to register 20,000 faces. Change /path/to/celeba.
 
 ```txt:celeba.csv
 imagepath, label
-/path/to/celeba/img_align_celeba\000001.jpg,F00001
-/path/to/celeba/img_align_celeba\000002.jpg,F00002
+<path_to_celeba_img_align_celeba>\000001.jpg,F00001
+<path_to_celeba_img_align_celeba>\000002.jpg,F00002
+<path_to_celeba_img_align_celeba>\000003.jpg,F00003
 ..
-/path/to/celeba/img_align_celeba\020000.jpg,F20000
+<path_to_celeba_img_align_celeba>\000004.jpg,F00004
 ```
 
 ### 3. Regiter command
@@ -153,13 +154,20 @@ Rows:19782
 
 ## Run app
 
-Specify face dbname (ex. celeba)
 
 ```sh
+#  dbname is the face db name (ex. celeba) 
+python app.py -i cam --no_v4l --dbname celeba
+```
+
+If you use OpenVINO Toolkit 2019 R3 or earlier build please specify `cpu_extension`.
+
+```sh
+#  dbname is the face db name (ex. celeba) 
 python app.py -i cam -l extension\cpu_extension.dll --no_v4l --dbname celeba
 ```
 
-Access to the url with browser
+Access to the url
 
 ```txt
 http://127.0.0.1:5000/

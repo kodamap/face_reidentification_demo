@@ -23,6 +23,7 @@ from libs.register import Register
 from libs.argparser import build_argparser
 from libs.utils import get_frame, get_face_frames, resize_frame, cos_similarity
 from datetime import datetime
+from openvino.inference_engine import get_version
 
 app = Flask(__name__)
 logger = getLogger(__name__)
@@ -287,8 +288,12 @@ if __name__ == '__main__':
     cpu_extension = args.cpu_extension
     dbname = args.dbname
 
-    if "CPU" in devices and args.cpu_extension is None:
+    # openvino.inference_engine version '2.1.37988' is openvino_2020.1.033 build
+    # , which does not need cpu extension. 
+    # https://software.intel.com/en-us/forums/intel-distribution-of-openvino-toolkit/topic/848825
+    if "CPU" in devices and args.cpu_extension is None and (get_version() < '2.1.37988'):
         print(
+            "\nPlugin for CPU device version is " + get_version() + " which is lower than 2.1.37988"
             "\nPlease try to specify cpu extensions library path in demo's command line parameters using -l "
             "or --cpu_extension command line argument")
         sys.exit(1)

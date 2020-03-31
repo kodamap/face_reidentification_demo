@@ -130,6 +130,12 @@ if __name__ == "__main__":
         help="Path to a image file or URL",
         type=str)
     parser.add_argument(
+        "-l",
+        "--cpu_extension",
+        help="MKLDNN (CPU)-targeted custom layers.Absolute path to a shared library with the kernels impl.",
+        type=str,
+        default=None)
+    parser.add_argument(
         "-d",
         "--device",
         help="Specify the target device for Face Detection to infer on; CPU, GPU, FPGA or MYRIAD is acceptable.",
@@ -157,7 +163,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     devices = ['CPU', 'CPU', 'CPU']
-    cpu_extension = 'extension/cpu_extension.dll'
+    cpu_extension = args.cpu_extension
     frame = None
     label_required_method = ['create', 'update', 'remove', 'change']
 
