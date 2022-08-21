@@ -11,16 +11,14 @@ import pickle as pkl
 
 logger = getLogger(__name__)
 basicConfig(
-    level=INFO,
-    format="%(asctime)s %(levelname)s %(name)s %(funcName)s(): %(message)s")
+    level=INFO, format="%(asctime)s %(levelname)s %(name)s %(funcName)s(): %(message)s"
+)
 
-FP32 = "extension/IR/FP32/"
-FP16 = "extension/IR/FP16/"
-
-model_fc_xml = 'face-detection-retail-0004.xml'  # input , shape: [1x3x300x300]
-# model_fc_xml = 'face-detection-adas-0001.xml'   # input , shape: [1x3x384x672]
-model_lm_xml = 'landmarks-regression-retail-0009.xml'
-model_fi_xml = 'face-reidentification-retail-0095.xml'
+model_path = "model/intel"
+model_fc = "face-detection-retail-0004"  # input , shape: [1x3x300x300]
+# model_fc = "face-detection-adas-0001"  # input , shape: [1x3x384x672]
+model_lm = "landmarks-regression-retail-0009"
+model_fi = "face-reidentification-retail-0095"
 
 # Threshold of similarity to draw result on faces
 sim_threshold = 0.4
@@ -29,48 +27,47 @@ fi_limit = 4
 
 
 class Detectors:
-    def __init__(self, devices, cpu_extension, is_async):
+    def __init__(self, devices):
 
-        self.cpu_extension = cpu_extension
         self.device_fc, self.device_lm, self.device_fi = devices
-        self.is_async = is_async
         self._define_models()
         self._load_detectors()
         self.colors = pkl.load(open("pallete", "rb"))
 
     def _define_models(self):
-
-        # set devices and models
-        fp_path = FP32 if self.device_fc == "CPU" else FP16
-        self.model_fc = fp_path + model_fc_xml
-
-        fp_path = FP32 if self.device_lm == "CPU" else FP16
-        self.model_lm = fp_path + model_lm_xml
-
-        fp_path = FP32 if self.device_fi == "CPU" else FP16
-        self.model_fi = fp_path + model_fi_xml
+        # face detection
+        fp_path = "FP16-INT8" if self.device_fc == "CPU" else "FP16"
+        self.model_fc = f"{model_path}/{model_fc}/{fp_path}/{model_fc}.xml"
+        # landmarks
+        fp_path = "FP16-INT8" if self.device_lm == "CPU" else "FP16"
+        self.model_lm = f"{model_path}/{model_lm}/{fp_path}/{model_lm}.xml"
+        # fi
+        fp_path = "FP16-INT8" if self.device_fi == "CPU" else "FP16"
+        self.model_fi = f"{model_path}/{model_fi}/{fp_path}/{model_fi}.xml"
 
     def _load_detectors(self):
 
         # face_detection
-        self.face_detector = detectors.FaceDetection(
-            self.device_fc, self.model_fc, self.cpu_extension, self.is_async)
+        self.face_detector = detectors.FaceDetection(self.device_fc, self.model_fc)
 
         # facial_landmark
         self.landmarks_detector = detectors.FacialLandmarks(
-            self.device_lm, self.model_lm, self.cpu_extension)
+            self.device_lm, self.model_lm
+        )
 
         # face re-identification
         self.face_id_detector = detectors.FaceReIdentification(
-            self.device_fi, self.model_fi, self.cpu_extension)
+            self.device_fi, self.model_fi
+        )
 
 
 class Detections(Detectors):
-    def __init__(self, frame, devices, cpu_extension, is_async=True):
-        super().__init__(devices, cpu_extension, is_async)
+    def __init__(self, frame, devices, is_async=True):
+        super().__init__(devices)
 
         # initialize Calculate FPS
         self.accum_time = 0
+        self.is_async = is_async
         self.curr_fps = 0
         self.fps = "FPS: ??"
         self.prev_time = timer()
@@ -92,8 +89,7 @@ class Detections(Detectors):
 
         for face_id, face_frame in enumerate(face_frames):
             aligned_face = face_frame.copy()
-            aligned_face = align_face(
-                aligned_face, facial_landmarks_per_face[face_id])
+            aligned_face = align_face(aligned_face, facial_landmarks_per_face[face_id])
             aligned_faces.append(aligned_face)
 
         # 3. get feature vectors of faces
@@ -108,8 +104,7 @@ class Detections(Detectors):
 
     def face_detection(self, frame, is_async, face_vecs, face_labels, is_fc, is_fi):
 
-        logger.debug("is_async:{}, is_fc:{}, is_fi:{}".format(
-            is_async, is_fc, is_fi))
+        logger.debug("is_async:{}, is_fc:{}, is_fi:{}".format(is_async, is_fc, is_fi))
 
         green = (0, 255, 0)
         skyblue = (255, 255, 0)
@@ -120,7 +115,8 @@ class Detections(Detectors):
         # just return frame when face detection and face reidentification are False
         if not is_fc and not is_fi:
             frame = self.draw_perf_stats(
-                det_time, "Video capture mode", frame, is_async)
+                det_time, "Video capture mode", frame, is_async
+            )
             return frame
 
         # ----------- Face Detection ---------- #
@@ -141,7 +137,8 @@ class Detections(Detectors):
         if faces is None or faces.shape[2] == 0:
             logger.info("no faces detected.")
             frame = self.draw_perf_stats(
-                det_time, "No faces are detected", frame, is_async)
+                det_time, "No faces are detected", frame, is_async
+            )
             return frame
 
         face_frames, boxes = get_face_frames(faces, self.frame)
@@ -154,8 +151,10 @@ class Detections(Detectors):
             face_w, face_h = face_frame.shape[:2]
             if face_w == 0 or face_h == 0:
                 logger.info(
-                    "Unexpected face frame shape. face_h:{} face_w:{}".
-                    format(face_h, face_w))
+                    "Unexpected face frame shape. face_h:{} face_w:{}".format(
+                        face_h, face_w
+                    )
+                )
                 return frame
 
         # Draw box and confidence
@@ -164,18 +163,23 @@ class Detections(Detectors):
                 # get box of each face
                 xmin, ymin, xmax, ymax = boxes[face_id]
                 confidence = round(faces[0][0][face_id][2] * 100, 1)
-                result = str(face_id) + " " + str(confidence) + '%'
+                result = str(face_id) + " " + str(confidence) + "%"
 
-                cv2.rectangle(self.frame, (xmin, ymin - 22),
-                              (xmax, ymin), green, -1)
-                cv2.rectangle(self.frame, (xmin, ymin - 22),
-                              (xmax, ymin), (255, 255, 255))
-                cv2.rectangle(self.frame, (xmin, ymin),
-                              (xmax, ymax), green, 1)
-                cv2.putText(self.frame, result, (xmin + 3, ymin - 5),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 0), 1)
-                logger.debug("face_id:{} confidence:{}%".format(
-                    face_id, confidence))
+                cv2.rectangle(self.frame, (xmin, ymin - 22), (xmax, ymin), green, -1)
+                cv2.rectangle(
+                    self.frame, (xmin, ymin - 22), (xmax, ymin), (255, 255, 255)
+                )
+                cv2.rectangle(self.frame, (xmin, ymin), (xmax, ymax), green, 1)
+                cv2.putText(
+                    self.frame,
+                    result,
+                    (xmin + 3, ymin - 5),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.35,
+                    (0, 0, 0),
+                    1,
+                )
+                logger.debug("face_id:{} confidence:{}%".format(face_id, confidence))
 
         # ----------- Face re-identification ---------- #
         if is_fi and face_vecs.any():
@@ -184,13 +188,11 @@ class Detections(Detectors):
             # set target
             inf_start = timer()
             # select 'fi_limit' faces. Too many faces effect performance.
-            feature_vecs, aligned_faces = self.preprocess(
-                face_frames[:fi_limit])
+            feature_vecs, aligned_faces = self.preprocess(face_frames[:fi_limit])
             inf_end = timer()
 
             det_time_fi = inf_end - inf_start
-            det_time_txt = det_time_txt + \
-                "reid:{:.3f} ms ".format(det_time_fi * 1000)
+            det_time_txt = det_time_txt + "reid:{:.3f} ms ".format(det_time_fi * 1000)
 
             # get similarity per face feature vectors
             for i, target_vec in enumerate(feature_vecs):
@@ -198,29 +200,47 @@ class Detections(Detectors):
 
                 # get index of the most similar face
                 face_id = similarity.argmax()
-                logger.debug("similarity:{} , similarity.argmax: {}".format(
-                    similarity, similarity.argmax()))
+                logger.debug(
+                    "similarity:{} , similarity.argmax: {}".format(
+                        similarity, similarity.argmax()
+                    )
+                )
                 xmin, ymin, xmax, ymax = boxes[i]
                 score = round(similarity[face_id] * 100, 1)
-                result = face_labels[face_id] + " " + str(score) + '%'
-                size = cv2.getTextSize(
-                    result, cv2.FONT_HERSHEY_SIMPLEX, 0.55, 1)
+                result = face_labels[face_id] + " " + str(score) + "%"
+                size = cv2.getTextSize(result, cv2.FONT_HERSHEY_SIMPLEX, 0.55, 1)
                 xtext = xmin + size[0][0] + 20
 
                 # draw similarity of each face into the frame
                 if similarity[face_id] > sim_threshold:
-                    cv2.rectangle(self.frame, (xmin, ymin - 22),
-                                  (xtext, ymin), self.colors[face_id], -1)
-                    cv2.rectangle(self.frame, (xmin, ymin - 22),
-                                  (xtext, ymin), self.colors[face_id])
-                    cv2.rectangle(self.frame, (xmin, ymin),
-                                  (xmax, ymax), self.colors[face_id], 1)
-                    cv2.putText(self.frame, result, (xmin + 3, ymin - 5),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1)
+                    cv2.rectangle(
+                        self.frame,
+                        (xmin, ymin - 22),
+                        (xtext, ymin),
+                        self.colors[face_id],
+                        -1,
+                    )
+                    cv2.rectangle(
+                        self.frame,
+                        (xmin, ymin - 22),
+                        (xtext, ymin),
+                        self.colors[face_id],
+                    )
+                    cv2.rectangle(
+                        self.frame, (xmin, ymin), (xmax, ymax), self.colors[face_id], 1
+                    )
+                    cv2.putText(
+                        self.frame,
+                        result,
+                        (xmin + 3, ymin - 5),
+                        cv2.FONT_HERSHEY_SIMPLEX,
+                        0.6,
+                        (255, 255, 255),
+                        1,
+                    )
 
         det_time = det_time_fc + det_time_fi
-        frame = self.draw_perf_stats(
-            det_time, det_time_txt, self.frame, is_async)
+        frame = self.draw_perf_stats(det_time, det_time_txt, self.frame, is_async)
 
         if is_async:
             self.frame = next_frame
@@ -231,24 +251,48 @@ class Detections(Detectors):
 
         # Draw FPS in top left corner
         fps = self.calc_fps()
-        cv2.rectangle(frame, (frame.shape[1] - 50, 0), (frame.shape[1], 17),
-                      (255, 255, 255), -1)
-        cv2.putText(frame, fps, (frame.shape[1] - 50 + 3, 10),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 0), 1)
+        cv2.rectangle(
+            frame, (frame.shape[1] - 50, 0), (frame.shape[1], 17), (255, 255, 255), -1
+        )
+        cv2.putText(
+            frame,
+            fps,
+            (frame.shape[1] - 50 + 3, 10),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.35,
+            (0, 0, 0),
+            1,
+        )
 
         # Draw performance stats
         if is_async:
             inf_time_message = "Total Inference time: {:.3f} ms for async mode".format(
-                det_time * 1000)
+                det_time * 1000
+            )
         else:
             inf_time_message = "Total Inference time: {:.3f} ms for sync mode".format(
-                det_time * 1000)
-        cv2.putText(frame, inf_time_message, (10, 15),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.4, (200, 10, 10), 1)
+                det_time * 1000
+            )
+        cv2.putText(
+            frame,
+            inf_time_message,
+            (10, 15),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.4,
+            (200, 10, 10),
+            1,
+        )
         if det_time_txt:
             inf_time_message_each = "Detection time: {}".format(det_time_txt)
-            cv2.putText(frame, inf_time_message_each, (10, 30),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.4, (200, 10, 10), 1)
+            cv2.putText(
+                frame,
+                inf_time_message_each,
+                (10, 30),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.4,
+                (200, 10, 10),
+                1,
+            )
         return frame
 
     def calc_fps(self):

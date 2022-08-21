@@ -1,17 +1,17 @@
 <!-- TOC -->
 
 - [Face Re-identification with OpenVINO](#face-re-identification-with-openvino)
-    - [What's this](#whats-this)
-    - [Reference](#reference)
-    - [Environment](#environment)
-    - [Required Python packages](#required-python-packages)
-    - [How to use](#how-to-use)
-    - [Create Face Database](#create-face-database)
-        - [1. Download Face images from CelebA](#1-download-face-images-from-celeba)
-        - [2. Create CSV file](#2-create-csv-file)
-        - [3. Regiter command](#3-regiter-command)
-        - [4. Verify data](#4-verify-data)
-    - [Run app](#run-app)
+  - [What's this](#whats-this)
+  - [Reference](#reference)
+  - [Environment](#environment)
+  - [Required Python packages](#required-python-packages)
+  - [How to use](#how-to-use)
+  - [Create Face Database](#create-face-database)
+    - [1. Download Face images from CelebA](#1-download-face-images-from-celeba)
+    - [2. Create CSV file](#2-create-csv-file)
+    - [3. Regiter command](#3-regiter-command)
+    - [4. Verify data](#4-verify-data)
+  - [Run app](#run-app)
 
 <!-- /TOC -->
 
@@ -49,11 +49,8 @@ Face Search
 ## Environment
 
 * Python 3.6+ (Required Ordered Dict)
-* OpenVINO Toolkit 2018 R5, 2019 R3, 2020.1 [^1]
+* OpenVINO Toolkit 2021.4[^1]
 * Windows 10
-
-[^1]: You may get "RuntimeError: Cannot load library 'extension\cpu_extension.dll': 126" Error. Please try to specify full path of `cpu_extension.dll`.
-
 
 ## Required Python packages
 
