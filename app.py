@@ -67,10 +67,11 @@ def gen(camera):
                 frame, is_async, face_vecs, face_labels, is_fd, is_fi
             )
         else:
-            logger.info("another preproces task detected: {}".format(is_preprocess))
+            logger.info(
+                "another preproces task detected: {}".format(is_preprocess))
 
         ret, jpeg = frame = cv2.imencode(".jpg", frame)
-        frame = jpeg.tostring()
+        frame = jpeg.tobytes()
         yield (b"--frame\r\n" b"Content-Type: image/jpeg\r\n\r\n" + frame + b"\r\n\r\n")
 
 
@@ -198,7 +199,8 @@ def registrar():
         new_label = request.json["newlabel"]
         logger.info("old_label:{} new_label:{}".format(old_label, new_label))
 
-        face_vecs_dict, face_pics_dict = face_register.change(old_label, new_label)
+        face_vecs_dict, face_pics_dict = face_register.change(
+            old_label, new_label)
         face_register.save(face_vecs_dict, face_pics_dict)
 
     if command == "remove":
@@ -298,7 +300,8 @@ if __name__ == "__main__":
 
     # arg parse
     args = build_argparser().parse_args()
-    devices = [args.device, args.device_landmarks, args.device_reidentification]
+    devices = [args.device, args.device_landmarks,
+               args.device_reidentification]
     dbname = args.dbname
 
     # load registered faces
@@ -315,4 +318,3 @@ if __name__ == "__main__":
     detections = Detections(camera.frame, devices, is_async)
 
     app.run(host="0.0.0.0", threaded=True)
-
