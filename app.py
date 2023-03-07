@@ -9,11 +9,9 @@
 #
 ###############################################################################
 
-from flask import Flask, Response, render_template, request, jsonify, url_for
+from flask import Flask, Response, render_template, request, jsonify
 from libs.camera import VideoCamera
 from logging import getLogger, basicConfig, DEBUG, INFO
-import os
-import sys
 import cv2
 import numpy as np
 import json
@@ -21,9 +19,8 @@ import base64
 from libs.interactive_detection import Detections
 from libs.register import Register
 from libs.argparser import build_argparser
-from libs.utils import get_frame, get_face_frames, resize_frame, cos_similarity
+from libs.utils import get_face_frames, resize_frame, cos_similarity
 from datetime import datetime
-from openvino.inference_engine import get_version
 
 app = Flask(__name__)
 logger = getLogger(__name__)
