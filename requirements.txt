@@ -1,6 +1,6 @@
-Flask==1.0.3
-joblib==0.13.2
-matplotlib==3.1.0
-opencv-python==4.2.0.32
-pillow>=6.2.0
+Flask==2.2.3
+joblib==1.2.0
+matplotlib==3.7.1
+opencv-python==4.7.0.72
+Pillow==9.4.0
 requests==2.22.0

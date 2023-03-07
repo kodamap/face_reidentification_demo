@@ -36,8 +36,8 @@ class BaseDetection(object):
         self._load_ir_to_plugin(device, net, detection_of)
 
     def _load_ir_to_plugin(self, device, net, detection_of):
-        """MYRIAD device's plugin should be initialized only once, 
-        MYRIAD plugin would be failed when creating exec_net 
+        """MYRIAD device's plugin should be initialized only once,
+        MYRIAD plugin would be failed when creating exec_net
         RuntimeError: Can not init Myriad device: NC_ERROR
         """
 
@@ -46,7 +46,8 @@ class BaseDetection(object):
 
         if detection_of == "Face Detection":
             logger.info(f"Checking {detection_of} network inputs")
-            assert len(net.input_info.keys()) == 1, "network should have only one input"
+            assert len(net.input_info.keys()
+                       ) == 1, "network should have only one input"
             assert len(net.outputs) == 1, "network should have only one output"
 
         self.input_blob = next(iter(net.input_info))
@@ -108,7 +109,8 @@ class FaceDetection(BaseDetection):
             in_frame = in_frame.transpose((2, 0, 1))
             in_frame = in_frame.reshape((n, c, h, w))
             self.exec_net.start_async(
-                request_id=self.next_request_id, inputs={self.input_blob: in_frame}
+                request_id=self.next_request_id, inputs={
+                    self.input_blob: in_frame}
             )
         else:
             logger.debug(
@@ -122,7 +124,8 @@ class FaceDetection(BaseDetection):
             in_frame = in_frame.transpose((2, 0, 1))
             in_frame = in_frame.reshape((n, c, h, w))
             self.exec_net.start_async(
-                request_id=self.cur_request_id, inputs={self.input_blob: in_frame}
+                request_id=self.cur_request_id, inputs={
+                    self.input_blob: in_frame}
             )
 
     def get_results(self, is_async):
@@ -135,7 +138,7 @@ class FaceDetection(BaseDetection):
 
         if self.exec_net.requests[self.cur_request_id].wait(-1) == 0:
             # res's shape: [1, 1, 200, 7]
-            res = self.exec_net.requests[self.cur_request_id].outputs[self.out_blob]
+            res = self.exec_net.requests[self.cur_request_id].output_blobs[self.out_blob].buffer
             # Get rows whose confidence is larger than prob_threshold.
             # detected faces are also used by age/gender, emotion, landmark, head pose detection.
             faces = res[0][:, np.where(res[0][0][:, 2] > prob_threshold_face)]
@@ -170,7 +173,8 @@ class FacialLandmarks(BaseDetection):
         five keypoints (left eye, right eye, tip of nose, left lip corner, right lip corner)
         """
 
-        res = self.exec_net.requests[0].outputs[self.out_blob]
+        # res = self.exec_net.requests[0].outputs[self.out_blob]
+        res = self.exec_net.requests[0].output_blobs[self.out_blob].buffer
         res = res.reshape(1, 10)[0]  # (10,)
 
         facial_landmarks = np.zeros((5, 2))  # five keypoints (x, y)
@@ -200,7 +204,8 @@ class FaceReIdentification(BaseDetection):
         face-reidentification-retail-0095:
           "658", [1, 256, 1, 1], containing a row-vector of 10 floating point values for five landmarks
         """
-        res = self.exec_net.requests[0].outputs[self.out_blob]
+        # res = self.exec_net.requests[0].outputs[self.out_blob]
+        res = self.exec_net.requests[0].output_blobs[self.out_blob].buffer
         # save feature vectors of faces
         feature_vec = res.reshape(1, 256)
         return feature_vec
