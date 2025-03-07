@@ -3,4 +3,4 @@ joblib==1.2.0
 matplotlib==3.7.1
 opencv-python==4.7.0.72
 Pillow==10.0.1
-requests==2.31.0
+requests==2.32.2
